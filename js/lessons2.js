@@ -9,7 +9,7 @@ LESSONS.push({
     printf("\\n");
 }</code></pre>
 ${D.ascii('*\n**\n***\n****', 'Kết quả: tam giác vuông (cột j chạy đến i)')}
-${D.steps([['i = 1', ['j=1']], ['i = 2', ['j=1', 'j=2']], ['i = 3', ['j=1', 'j=2', 'j=3']], ['i = 4', ['j=1', 'j=2', 'j=3', 'j=4']]], 'Số lần chạy vòng trong tăng dần theo i')}
+${D.nested(4)}
 <div class="note"><b>Mẹo:</b> luôn tự hỏi "hàng i cần in mấy ký tự?" – đó chính là điều kiện của vòng trong. Cây thông cân: hàng i cần (n - i) dấu cách và (2i - 1) dấu *.</div>`,
   diagram: '',
   codes: [
@@ -109,7 +109,7 @@ ${D.mem([{n: 'a (main)', v: 5, t: 'int', a: '0x1000'}, {n: 'b (main)', v: 9, t: 
 ${D.mem([{n: 'a', v: 5, t: 'int', a: '0x1000'}, {n: 'p', v: '0x1000', t: 'int*', a: '0x1008'}], 'p lưu địa chỉ của a → *p chính là a')}
 <h3>swap đúng</h3><p>Truyền <b>địa chỉ</b> <code>swap(&amp;a, &amp;b)</code>, hàm nhận <code>int *x, int *y</code> và hoán đổi <code>*x</code>, <code>*y</code>. Đây cũng là lý do <code>scanf</code> cần dấu &amp;!</p>
 <h3>Đệ quy</h3><p>Hàm tự gọi chính nó, cần <b>điều kiện dừng</b>: n! = n × (n-1)!, 0! = 1.</p>`,
-  diagram: D.steps([['Trước swap', [5, 9], [0, 1]], ['t = a', [5, 9, 'tạm=5']], ['a = b', [9, 9, 'tạm=5']], ['b = t', [9, 5, 'tạm=5'], [0, 1]]], 'Hoán đổi cần biến tạm'),
+  diagram: D.swapVars(5, 9),
   codes: [
     {t: 'Swap sai và swap đúng', c: R`#include <stdio.h>
 
@@ -153,6 +153,7 @@ a[0] = 10;       // phần tử đầu
 a[4]             // phần tử cuối (chỉ số = n - 1)</code></pre>
 ${D.arr([8, 6, 9, 4, 7], 'a', [], 'Mảng 5 phần tử: chỉ số 0 → 4')}
 ${D.bars('Điểm của 5 sinh viên (lưu trong mảng diem[5])', ['SV0', 'SV1', 'SV2', 'SV3', 'SV4'], [8, 6, 9, 4, 7], 'Mỗi cột là một phần tử mảng')}
+${D.sumArr([8, 6, 9, 4, 7])}
 <div class="warn"><b>Tràn chỉ số:</b> <code>a[5]</code> hay <code>a[-1]</code> với mảng 5 phần tử là lỗi nghiêm trọng – ghi đè vùng nhớ khác, gây treo/ hỏng dữ liệu. Chương trình thật không báo lỗi, nên phải tự kiểm soát.</div>
 <h3>Duyệt mảng</h3><pre><code>for (int i = 0; i &lt; n; i++) { /* dùng a[i] */ }</code></pre>`,
   diagram: '',
@@ -190,10 +191,11 @@ LESSONS.push({
   goals: ['Tìm giá trị lớn nhất / nhỏ nhất và vị trí', 'Tìm kiếm tuyến tính', 'Thêm và xóa phần tử', 'Truyền mảng vào hàm'],
   theory: `
 <h3>Tìm max</h3><p>Giả sử phần tử đầu là lớn nhất, duyệt các phần tử còn lại, gặp số lớn hơn thì cập nhật.</p>
-${D.steps([['Khởi đầu', [4, 9, 2, 7, 5], [0]], ['i=1: 9>4', [4, 9, 2, 7, 5], [1]], ['i=3: 7<9', [4, 9, 2, 7, 5], [1, 3]], ['Kết quả', ['max = 9', 'vị trí 1']]], 'Biến max cập nhật khi gặp số lớn hơn')}
+${D.findMax([4, 9, 2, 7, 5, 11, 3])}
 <h3>Tìm kiếm tuyến tính</h3><p>Duyệt từ đầu, gặp x thì trả về chỉ số; hết mảng không thấy trả về -1.</p>
+${D.search([4, 9, 2, 7, 5], 7)}
 <h3>Xóa phần tử tại vị trí k</h3><p>Dồn các phần tử sau k lên một ô rồi giảm n: <code>for (i = k; i &lt; n-1; i++) a[i] = a[i+1]; n--;</code></p>
-${D.steps([['Mảng', [1, 2, 3, 4, 5], [2]], ['Dồn lên', [1, 2, 4, 5, 5], [2, 3]], ['n = n - 1', [1, 2, 4, 5]]], 'Xóa phần tử ở chỉ số 2 (giá trị 3)')}
+${D.deleteAt([1, 2, 3, 4, 5], 2)}
 <div class="note"><b>Mảng truyền vào hàm</b> thực chất truyền <u>địa chỉ</u>: hàm sửa mảng thì mảng gốc đổi theo (khác với biến thường!). Phải truyền thêm kích thước n.</div>`,
   diagram: '',
   codes: [
@@ -243,11 +245,12 @@ LESSONS.push({
   goals: ['Hiểu bài toán sắp xếp tăng/giảm', 'Cài đặt Bubble sort và Selection sort', 'Quan sát từng bước để hiểu thuật toán', 'Biết so sánh hiệu quả (số lần so sánh)'],
   theory: `
 <h3>Bubble sort (nổi bọt)</h3><p>Duyệt nhiều lượt, so sánh <b>hai phần tử kề nhau</b>, sai thứ tự thì đổi chỗ. Sau mỗi lượt, phần tử lớn nhất "nổi" về cuối.</p>
-${D.steps([['Ban đầu', [5, 3, 8, 1, 4]], ['Lượt 1', [3, 5, 1, 4, 8], [4]], ['Lượt 2', [3, 1, 4, 5, 8], [3, 4]], ['Lượt 3', [1, 3, 4, 5, 8], [2, 3, 4]], ['Xong', [1, 3, 4, 5, 8], [0, 1, 2, 3, 4]]], 'Bubble sort sắp xếp tăng dần (ô sáng = đã đúng vị trí)')}
+${D.bubble([5, 3, 8, 1, 4])}
 <h3>Selection sort (chọn)</h3><p>Mỗi lượt chọn phần tử <b>nhỏ nhất</b> của phần chưa sắp xếp, đổi chỗ vào đầu phần đó.</p>
 <pre><code>for (i = 0; i &lt; n-1; i++)
   for (j = i+1; j &lt; n; j++)
     if (a[j] &lt; a[i]) swap(a[i], a[j]);</code></pre>
+${D.selection([6, 2, 9, 4, 1])}
 ${D.line('Số phép so sánh tối đa theo n (độ phức tạp O(n²))', ['n=5', 'n=10', 'n=20', 'n=40', 'n=80'], [{name: 'Bubble/Selection', pts: [10, 45, 190, 780, 3160]}, {name: 'Tuyến tính', pts: [5, 10, 20, 40, 80]}], 'Mảng gấp đôi → công việc gấp ~4: vì vậy thuật toán tốt hơn rất quan trọng với dữ liệu lớn')}
 <div class="note"><b>Giảm dần:</b> chỉ cần đổi dấu so sánh từ &gt; thành &lt;.</div>`,
   diagram: '',
@@ -302,6 +305,7 @@ LESSONS.push({
 // a[i][j]: hàng i, cột j  (bắt đầu từ 0)</code></pre>
 ${D.grid([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], 'a', 'Mảng a[3][4]: 3 hàng, 4 cột. Phần tử a[1][2] = 7')}
 <ul><li>Duyệt: vòng ngoài là <b>hàng i</b>, vòng trong là <b>cột j</b>.</li><li>Tổng hàng i: cộng a[i][0..m-1]. Tổng cột j: cộng a[0..n-1][j].</li></ul>
+${D.matrix([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])}
 ${D.bars('Tổng từng hàng của ma trận trên', ['Hàng 0', 'Hàng 1', 'Hàng 2'], [10, 26, 42], 'Kết quả tổng hàng: 10, 26, 42')}
 <div class="note"><b>Ứng dụng thực tế:</b> bảng điểm 5 sinh viên × 3 môn, sơ đồ chỗ ngồi rạp chiếu phim, bảng cửu chương, bàn cờ caro.</div>`,
   diagram: '',
@@ -351,8 +355,8 @@ LESSONS.push({
   theory: `
 <h3>Các phép toán ma trận</h3>
 <ul><li><b>Cộng</b>: c[i][j] = a[i][j] + b[i][j] (hai ma trận cùng cỡ).</li><li><b>Chuyển vị</b>: t[j][i] = a[i][j] (đổi hàng thành cột).</li><li><b>Nhân</b> A(m×n) · B(n×p): c[i][j] = Σ a[i][k]·b[k][j].</li></ul>
-${D.grid([[1, 2, 3], [4, 5, 6]], 'a', 'A (2×3)')}
-${D.grid([[1, 4], [2, 5], [3, 6]], 't', 'Chuyển vị Aᵀ (3×2): t[j][i] = a[i][j]')}
+${D.transpose([[1, 2, 3], [4, 5, 6]])}
+
 <h3>Đường chéo</h3><p>Ma trận vuông n×n: đường chéo chính có <b>i == j</b>, đường chéo phụ có <b>i + j == n - 1</b>.</p>
 <div class="note">Khi truyền mảng hai chiều vào hàm phải ghi rõ số cột: <code>void in(int a[][3], int n)</code>.</div>`,
   diagram: '',

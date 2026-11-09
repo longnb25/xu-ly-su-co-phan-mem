@@ -51,14 +51,18 @@ route('lesson', ['student', 'admin'], async id => {
   const labs = [...DEFAULT_LABS, ...Object.entries(labsDb).map(([k, v]) => ({...v, id: k}))].filter(x => +x.lesson === l.n);
   $('#app').innerHTML = `<div class="row"><a href="#/lessons">← Danh sách</a><span class="sp"></span>${l.n > 1 ? `<a class="btn sm" href="#/lesson/${l.n - 1}">◀ Buổi ${l.n - 1}</a>` : ''}${l.n < 18 ? `<a class="btn sm" href="#/lesson/${l.n + 1}">Buổi ${l.n + 1} ▶</a>` : ''}</div>
   <div class="lh"><div class="kick">BUỔI ${l.n} / 18 · 3 GIỜ (LÝ THUYẾT + THỰC HÀNH)</div><h1>${esc(l.title)}</h1><p>${esc(l.sub)}</p></div>
-  <div class="card"><h3>🎯 Mục tiêu</h3><ul>${l.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>
-  <div class="card lessonbody"><h2>📖 Lý thuyết</h2>${l.theory}${l.diagram || ''}</div>
-  <div class="card"><h2>💡 Ví dụ minh họa (chạy thử ngay)</h2>${l.codes.map((c, i) => `<div class="ex-code" data-i="${i}" style="margin-bottom:18px"><b>Ví dụ ${i + 1}: ${esc(c.t)}</b><pre><code>${hl(c.c)}</code></pre>
+  <div class="lgrid"><div class="lmain">
+  <div class="card" id="s-goal"><h3>🎯 Mục tiêu</h3><ul>${l.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>
+  <div class="card lessonbody" id="s-theory"><h2>📖 Lý thuyết</h2>${l.theory}${l.diagram || ''}</div>
+  <div class="card" id="s-code"><h2>💡 Ví dụ minh họa (chạy thử ngay)</h2>${l.codes.map((c, i) => `<div class="ex-code" data-i="${i}" style="margin-bottom:18px"><b>Ví dụ ${i + 1}: ${esc(c.t)}</b><pre><code>${hl(c.c)}</code></pre>
     ${c.input != null ? `<div class="muted" style="font-size:12.5px">Dữ liệu nhập (stdin):</div><textarea rows="${Math.min(4, c.input.split('\n').length)}" class="inp" style="font-family:var(--mono)">${esc(c.input)}</textarea>` : ''}
     <div class="row" style="margin-top:6px"><button class="btn pri sm run">▶ Chạy thử</button><button class="btn sm ide">💻 Mở trong trình soạn code</button></div><div class="runout hide"></div></div>`).join('')}</div>
-  <div class="card"><h2>🛠 Bài tập thực tế</h2>${l.ex.map((e, i) => `<div class="ex"><b>${i + 1}.</b><div>${esc(e)}</div></div>`).join('')}<p><a class="btn pri" href="#/ide">💻 Làm bài trong trình soạn code</a></p></div>
+  <div class="card" id="s-ex"><h2>🛠 Bài tập thực tế</h2>${l.ex.map((e, i) => `<div class="ex"><b>${i + 1}.</b><div>${esc(e)}</div></div>`).join('')}<p><a class="btn pri" href="#/ide">💻 Làm bài trong trình soạn code</a></p></div>
   ${labs.length ? `<div class="card"><h2>🧪 Bài thực hành có chấm tự động</h2>${labs.map(x => `<div class="ex"><b>▸</b><div><a href="#/lab/${esc(x.id)}">${esc(x.title)}</a></div></div>`).join('')}</div>` : ''}
-  ${extra.length ? `<div class="card"><h2>📎 Học liệu bổ sung của giảng viên</h2>${extra.map(([k, m]) => `<div class="ex"><b>▸</b><div><a href="#/material/${k}">${esc(m.title)}</a></div></div>`).join('')}</div>` : ''}`;
+  ${extra.length ? `<div class="card"><h2>📎 Học liệu bổ sung của giảng viên</h2>${extra.map(([k, m]) => `<div class="ex"><b>▸</b><div><a href="#/material/${k}">${esc(m.title)}</a></div></div>`).join('')}</div>` : ''}</div>
+  <aside class="toc"><b>Nội dung buổi ${l.n}</b><a href="#" data-s="s-goal">🎯 Mục tiêu</a><a href="#" data-s="s-theory">📖 Lý thuyết</a><a href="#" data-s="s-code">💡 Ví dụ (${l.codes.length})</a><a href="#" data-s="s-ex">🛠 Bài tập (${l.ex.length})</a></aside></div>`;
+  initAnims($('#app'));
+  $$('.toc a').forEach(a => a.onclick = e => { e.preventDefault(); document.getElementById(a.dataset.s).scrollIntoView({behavior: 'smooth', block: 'start'}); });
   $$('.ex-code').forEach(box => {
     const c = l.codes[box.dataset.i], out = $('.runout', box);
     $('.run', box).onclick = () => { const inp = $('.inp', box); const r = runC(c.c, inp ? inp.value : ''); out.classList.remove('hide'); out.innerHTML = outHtml(r); };

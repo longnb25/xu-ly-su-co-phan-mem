@@ -82,7 +82,7 @@ ${D.table(['Toán tử', 'Ý nghĩa', 'Ví dụ', 'Kết quả'], [['+ - *', 'c�
 <h3>Độ ưu tiên</h3><p>Ngoặc <code>( )</code> → <code>* / %</code> → <code>+ -</code>. Khi không chắc, hãy dùng ngoặc.</p>
 <div class="note"><b>i++ và ++i:</b> <code>a = i++</code> gán trước rồi mới tăng; <code>a = ++i</code> tăng trước rồi mới gán.</div>
 <h3>Ép kiểu</h3><p><code>(float)a / b</code> ép <code>a</code> thành số thực trước khi chia – cách chuẩn để tính trung bình.</p>`,
-  diagram: D.flow([{t: 'Bắt đầu', k: 'start'}, {t: 'n = 4125', k: 'io'}, {t: 'cuoi = n % 10 (=5)', k: 'proc'}, {t: 'n = n / 10 (=412)', k: 'proc'}, {t: 'Kết thúc', k: 'start'}], 'Tách chữ số cuối bằng % và /'),
+  diagram: D.digits(4125),
   codes: [
     {t: 'Hằng và toán tử', c: R`#include <stdio.h>
 #define VAT 10
@@ -325,7 +325,7 @@ LESSONS.push({
 <p>Khi <b>không biết trước số lần lặp</b> (ví dụ nhập đến khi người dùng nhập 0), dùng <code>while</code>:</p>
 <pre><code>while (điều_kiện) { ... }       // kiểm tra trước, có thể không chạy lần nào
 do { ... } while (điều_kiện);   // chạy ít nhất 1 lần</code></pre>
-${D.flow([{t: 'Nhập n', k: 'io'}, {t: 'n > 0 ?', k: 'dec', yes: 'xử lí', no: 'thoát'}, {t: 'Lấy chữ số cuối, n /= 10', k: 'proc'}], 'while: lặp khi điều kiện còn đúng (đếm số chữ số của n)')}
+${D.digits(2579, 'while: tách chữ số cho đến khi n = 0')}
 <ul><li><code>break</code>: thoát hẳn khỏi vòng lặp.</li><li><code>continue</code>: bỏ qua phần còn lại của vòng này, sang vòng kế.</li></ul>
 <div class="tip note"><b>Mẹo thực tế:</b> do-while rất hợp để bắt người dùng nhập lại đến khi hợp lệ (điểm 0–10, mật khẩu đúng...).</div>
 <h3>Bài toán kinh điển</h3><ul><li>Đếm / tổng các chữ số của một số.</li><li>Đảo ngược số.</li><li>Ước chung lớn nhất (thuật toán Euclid): while (b != 0) { r = a % b; a = b; b = r; }</li></ul>`,

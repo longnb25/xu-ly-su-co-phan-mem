@@ -140,7 +140,7 @@ async function router() {
   if (!rt) { $('#app').innerHTML = '<div class="card">Không tìm thấy trang. <a href="#/">Về trang chủ</a></div>'; return; }
   if (!rt.roles.includes(role())) { $('#app').innerHTML = `<div class="card warn note">Bạn cần đăng nhập với quyền phù hợp để xem trang này. <a href="#/login">Đăng nhập</a></div>`; return; }
   window.scrollTo(0, 0); loading();
-  try { await rt.fn(decodeURIComponent(seg.slice(2).join('/'))); }
+  try { await rt.fn(decodeURIComponent(seg.slice(2).join('/'))); if (window.revealAll) revealAll(); }
   catch (e) { console.error(e); $('#app').innerHTML = `<div class="card note warn"><b>Có lỗi:</b> ${esc(e.message)}<br><small>Kiểm tra kết nối mạng và Firebase (Rules đã mở read/write chưa).</small></div>`; }
 }
 window.addEventListener('hashchange', router);

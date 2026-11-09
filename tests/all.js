@@ -1,7 +1,7 @@
 const fs = require('fs'), vm = require('vm');
 const ctx = {console, globalThis: null}; ctx.globalThis = ctx; ctx.window = ctx; vm.createContext(ctx);
 const load = f => vm.runInContext(fs.readFileSync(__dirname + '/../js/' + f, 'utf8'), ctx, {filename: f});
-['cint.js', 'diagrams.js', 'lessons1.js', 'lessons2.js', 'data.js'].forEach(load);
+['cint.js', 'diagrams.js', 'anim.js', 'lessons1.js', 'lessons2.js', 'data.js'].forEach(load);
 const get = n => vm.runInContext(n, ctx);
 const LESSONS = get('LESSONS'), LABS = get('DEFAULT_LABS'), CI = get('CInterp');
 let bad = 0;
