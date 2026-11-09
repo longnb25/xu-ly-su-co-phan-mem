@@ -4,16 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>XỬ LÍ SỰ CỐ PHẦN MỀM – Lập trình C</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='70' font-size='62' text-anchor='middle' fill='white' font-family='monospace' font-weight='bold'>C</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%234f46e5'/><text x='50' y='70' font-size='62' text-anchor='middle' fill='white' font-family='monospace' font-weight='bold'>C</text></svg>">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header><div class="bar">
-  <div class="brand" onclick="location.hash='#/'">&lt;/&gt; XỬ LÍ SỰ CỐ PHẦN MỀM<small>LẬP TRÌNH C · K19IT</small></div>
-  <nav id="nav"></nav>
-  <div class="right"><select id="themeSel" title="Giao diện"><option value="light">☀ Sáng</option><option value="dark">🌙 Tối</option><option value="hacker">💻 Hacker</option></select><span id="who" class="right"></span></div>
-</div></header>
-<main id="app"></main>
+<canvas id="rain"></canvas>
+<div class="app">
+  <aside id="side">
+    <div class="brand" onclick="location.hash='#/'"><div class="logo">C</div><div><b>XỬ LÍ SỰ CỐ<br>PHẦN MỀM</b><small>LẬP TRÌNH C · K19IT</small></div></div>
+    <nav id="nav"></nav>
+    <div class="sidefoot">© K19IT · Học C từ nền tảng<br>Chạy code ngay trên trình duyệt</div>
+  </aside>
+  <div class="content">
+    <header class="top">
+      <button id="burger" aria-label="Menu">☰</button>
+      <div id="crumb"></div>
+      <div class="right"><div class="seg" id="seg"><button data-t="light">☀ Sáng</button><button data-t="dark">🌙 Tối</button><button data-t="hacker">⌨ Hacker</button></div><span id="who" class="right"></span></div>
+    </header>
+    <main id="app"></main>
+  </div>
+</div>
 <script src="js/cint.js"></script>
 <script src="js/diagrams.js"></script>
 <script src="js/lessons1.js"></script>
@@ -24,9 +34,22 @@
 <script src="js/learn.js"></script>
 <script src="js/quiz.js"></script>
 <script>
-  $('#themeSel').value = document.documentElement.getAttribute('data-theme');
-  $('#themeSel').onchange = e => setTheme(e.target.value);
-  if (!location.hash || (location.hash === '#/' && false)) location.hash = S.user ? '#/' : '#/login';
+  $$('#seg button').forEach(b => b.onclick = () => setTheme(b.dataset.t));
+  setTheme(document.documentElement.getAttribute('data-theme'));
+  $('#burger').onclick = () => $('#side').classList.toggle('open');
+  $('#app').addEventListener('click', () => $('#side').classList.remove('open'));
+  /* Mưa ký tự cho theme hacker */
+  (() => {
+    const c = $('#rain'), x = c.getContext('2d'); let cols, drops;
+    const fit = () => { c.width = innerWidth; c.height = innerHeight; cols = Math.ceil(c.width / 16); drops = Array.from({length: cols}, () => Math.random() * -50); };
+    fit(); addEventListener('resize', fit);
+    setInterval(() => {
+      if (document.documentElement.getAttribute('data-theme') !== 'hacker') return;
+      x.fillStyle = 'rgba(0,10,3,.12)'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#00ff66'; x.font = '15px monospace';
+      drops.forEach((y, i) => { x.fillText('01{}();#<>=*+'[Math.floor(Math.random() * 13)], i * 16, y * 16); drops[i] = (y * 16 > c.height && Math.random() > .975) ? 0 : y + 1; });
+    }, 55);
+  })();
+  if (!location.hash) location.hash = S.user ? '#/' : '#/login';
   router();
 </script>
 </body>

@@ -39,7 +39,7 @@ const isStudent = () => role() === 'student';
 const isGuest = () => role() === 'guest' ;
 
 /* ----- Theme ----- */
-function setTheme(t) { document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('vb_theme', t); } catch (e) {} const s = $('#themeSel'); if (s) s.value = t; }
+function setTheme(t) { document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('vb_theme', t); } catch (e) {} $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
 setTheme((() => { try { return localStorage.getItem('vb_theme') || 'light'; } catch (e) { return 'light'; } })());
 
 /* ----- Tiện ích UI ----- */
@@ -99,24 +99,37 @@ async function students() {
 /* ----- Router & khung trang ----- */
 const ROUTES = {};
 function route(path, roles, fn) { ROUTES[path] = {roles, fn}; }
+const IC = {
+  home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>', book: '<path d="M4 4h6a3 3 0 013 3v13a2 2 0 00-2-2H4z"/><path d="M20 4h-6a3 3 0 00-3 3"/><path d="M20 4v14h-7"/>',
+  folder: '<path d="M3 6a2 2 0 012-2h4l2 3h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>', code: '<path d="M8 8l-5 4 5 4"/><path d="M16 8l5 4-5 4"/><path d="M14 5l-4 14"/>',
+  quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.7-1.5 1.2-1.5 2.5"/><path d="M12 17.5v.01"/>', flask: '<path d="M9 3h6"/><path d="M10 3v6L4.5 19a1.5 1.5 0 001.3 2.2h12.4a1.5 1.5 0 001.3-2.2L14 9V3"/><path d="M7.5 15h9"/>',
+  chart: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>', trophy: '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 01-10 0z"/><path d="M17 5h3v2a3 3 0 01-3 3"/><path d="M7 5H4v2a3 3 0 003 3"/>',
+  cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M8 15l2.5 2.5L16 13"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><path d="M16 4.5a3.5 3.5 0 010 7"/><path d="M18 14a6 6 0 013.5 6"/>'
+};
+const isOn = (h, cur) => h === '#/' ? cur === '#/' : (cur === h || cur.startsWith(h + '/') || cur.startsWith(h.slice(0, -1) + '/'));
+const icon = k => `<svg viewBox="0 0 24 24">${IC[k]}</svg>`;
 const NAV = [
-  ['#/', 'Trang chủ', ['guest', 'student', 'admin']],
-  ['#/lessons', 'Bài học', ['student', 'admin']],
-  ['#/materials', 'Học liệu', ['student', 'admin']],
-  ['#/ide', 'Lập trình C', ['student', 'admin']],
-  ['#/quizzes', 'Trắc nghiệm', ['student', 'admin']],
-  ['#/labs', 'Thực hành', ['student', 'admin']],
-  ['#/scores', 'Bảng điểm', ['guest', 'student', 'admin']],
-  ['#/rank', 'Xếp hạng', ['student', 'admin']],
-  ['#/attendance', 'Điểm danh', ['guest', 'student', 'admin']],
-  ['#/students', 'Sinh viên', ['admin']]
+  ['Tổng quan', '#/', 'Trang chủ', 'home', ['guest', 'student', 'admin']],
+  ['Học tập', '#/lessons', 'Bài học 18 buổi', 'book', ['student', 'admin']],
+  ['', '#/materials', 'Học liệu', 'folder', ['student', 'admin']],
+  ['', '#/ide', 'Lập trình C', 'code', ['student', 'admin']],
+  ['Kiểm tra', '#/quizzes', 'Trắc nghiệm', 'quiz', ['student', 'admin']],
+  ['', '#/labs', 'Thực hành', 'flask', ['student', 'admin']],
+  ['Lớp học', '#/scores', 'Bảng điểm', 'chart', ['guest', 'student', 'admin']],
+  ['', '#/rank', 'Xếp hạng', 'trophy', ['student', 'admin']],
+  ['', '#/attendance', 'Điểm danh', 'cal', ['guest', 'student', 'admin']],
+  ['Quản trị', '#/students', 'Sinh viên', 'users', ['admin']]
 ];
 function renderShell() {
   const r = role(), cur = location.hash || '#/';
-  $('#nav').innerHTML = NAV.filter(n => n[2].includes(r)).map(n => `<a href="${n[0]}" class="${cur === n[0] || (n[0] !== '#/' && cur.startsWith(n[0])) ? 'on' : ''}">${n[1]}</a>`).join('');
+  $('#nav').innerHTML = NAV.filter(n => n[4].includes(r)).map(n => `${n[0] ? `<div class="navg">${n[0]}</div>` : ''}<a href="${n[1]}" class="${isOn(n[1], cur) ? 'on' : ''}">${icon(n[3])}${n[2]}</a>`).join('');
+  const pg = NAV.find(n => n[1] !== '#/' && cur.startsWith(n[1])) || NAV[0]; const lessonLike = /^#\/(lesson|material|quiz|lab)\//.test(cur);
+  $('#crumb').innerHTML = `${esc(cur === '#/login' ? 'Đăng nhập' : (lessonLike ? ({lesson: 'Bài học', material: 'Học liệu', quiz: 'Trắc nghiệm', lab: 'Thực hành'})[cur.split('/')[1]] : pg[2]))}<small>XỬ LÍ SỰ CỐ PHẦN MỀM · Lập trình C</small>`;
+  $('#side').classList.remove('open');
+  const ini = S.user ? (S.user.name || '?').trim().split(' ').pop()[0].toUpperCase() : '👤';
   $('#who').innerHTML = S.user
-    ? `<span class="tag">${isAdmin() ? '👑 Admin' : '🎓 ' + esc(S.user.name)}</span><button class="btn sm" id="pw">Đổi mật khẩu</button><button class="btn sm" id="out">Đăng xuất</button>`
-    : `<span class="tag">👤 Khách</span><a class="btn pri sm" href="#/login">Đăng nhập</a>`;
+    ? `<div class="user"><div class="av">${isAdmin() ? '★' : esc(ini)}</div><span class="n">${isAdmin() ? 'Admin' : esc(S.user.name)}</span></div><button class="btn sm" id="pw">🔑</button><button class="btn sm" id="out">Thoát</button>`
+    : `<div class="user"><div class="av">👤</div><span class="n">Khách</span></div><a class="btn pri sm" href="#/login">Đăng nhập</a>`;
   if (S.user) { $('#pw').onclick = changePw; $('#out').onclick = () => { S.user = null; localStorage.removeItem('vb_user'); location.hash = '#/login'; }; }
 }
 async function router() {
@@ -169,16 +182,21 @@ async function viewLogin() {
 }
 
 /* ----- Trang chủ ----- */
+const lessonCard = l => `<a class="card lcard" href="#/lesson/${l.n}"><div class="num">${String(l.n).padStart(2, '0')}</div><h3>Buổi ${l.n}</h3><b>${esc(l.title)}</b><p class="muted" style="margin:8px 0 10px;font-size:13.5px">${esc(l.sub.split('·')[0])}</p><span class="tag">⏱ 3 giờ</span> ${l.test ? `<span class="tag ${l.test === '15p' ? 'k15' : 'k1t'}">📝 KT ${l.test}</span>` : ''}</a>`;
+const qk = (href, ic, t, d) => `<a class="card lcard qk" href="${href}"><div class="ic">${icon(ic)}</div><div><b>${t}</b><p class="muted" style="margin:3px 0 0;font-size:13.5px">${d}</p></div></a>`;
 route('', ['guest', 'student', 'admin'], async () => {
-  const test = n => n.test ? `<span class="tag ${n.test === '15p' ? 'k15' : 'k1t'}">KT ${n.test}</span>` : '';
   let mine = '';
   if (isStudent()) {
     const sc = await DB.get('scores/' + S.user.id) || {}; const avg = average(sc);
-    mine = `<div class="card"><h3>Điểm của bạn</h3><div class="row">${COLS.map(c => `<div class="tag" style="font-size:14px;padding:6px 14px">${c.t}: <b>${sc[c.k] ?? '–'}</b></div>`).join('')}<div class="tag" style="font-size:14px;padding:6px 14px">TB tạm tính: <b>${avg == null ? '–' : fmt(avg)}</b> ${xepLoai(avg)}</div></div></div>`;
+    mine = `<div class="card"><h3>📌 Điểm của bạn</h3><div class="row">${COLS.map(c => `<div class="tag" style="font-size:14px;padding:7px 16px">${c.t}: <b>${sc[c.k] ?? '–'}</b></div>`).join('')}<div class="tag" style="font-size:14px;padding:7px 16px;background:var(--grad);color:#fff;border:0">TB tạm tính: <b>${avg == null ? '–' : fmt(avg)}</b> ${xepLoai(avg)}</div></div></div>`;
   }
-  $('#app').innerHTML = `<div class="hero"><h1>XỬ LÍ SỰ CỐ PHẦN MỀM</h1><p>Học lập trình C từ nền tảng · 18 buổi · lý thuyết + thực hành · lớp K19IT</p>
-    <p style="margin-top:14px">${S.user ? `Xin chào, <b>${esc(S.user.name)}</b>!` : 'Bạn đang xem với tư cách khách (chỉ xem điểm & điểm danh).'}</p></div>${mine}
-    ${isGuest() ? `<div class="grid"><a class="card lcard" href="#/scores"><h3>📊 Bảng điểm</h3><p class="muted">Xem điểm 15 phút, 1 tiết, thi của cả lớp.</p></a><a class="card lcard" href="#/attendance"><h3>🗓 Điểm danh</h3><p class="muted">Xem danh sách điểm danh theo ngày.</p></a><a class="card lcard" href="#/login"><h3>🔑 Đăng nhập</h3><p class="muted">Sinh viên đăng nhập để học & làm bài.</p></a></div>` : `
-    <h2>📚 Lộ trình 18 buổi</h2><div class="lesson-grid">${LESSONS.map(l => `<a class="card lcard" href="#/lesson/${l.n}" style="color:inherit;text-decoration:none"><div class="num">${l.n}</div><h3>Buổi ${l.n}</h3><b>${esc(l.title)}</b><p class="muted" style="margin:6px 0">${esc(l.sub.split('·')[0])}</p>${test(l)}</a>`).join('')}</div>
-    <h2 style="margin-top:24px">🚀 Truy cập nhanh</h2><div class="grid"><a class="card lcard" href="#/ide"><h3>💻 Lập trình C</h3><p class="muted">Soạn, chạy, lưu code C ngay trên trình duyệt như Dev-C++.</p></a><a class="card lcard" href="#/quizzes"><h3>📝 Trắc nghiệm</h3><p class="muted">Làm bài kiểm tra 15 phút & 1 tiết.</p></a><a class="card lcard" href="#/labs"><h3>🧪 Thực hành</h3><p class="muted">Bài tập code có chấm tự động.</p></a><a class="card lcard" href="#/rank"><h3>🏆 Xếp hạng</h3><p class="muted">Bảng xếp hạng điểm của lớp.</p></a></div>`}`;
+  const code = `<span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>\n\n<span class="ty">int</span> main() {\n    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">1</span>; i &lt;= <span class="nm">3</span>; i++)\n        printf(<span class="st">"Buoi %d\n"</span>, i);\n    <span class="kw">return</span> <span class="nm">0</span>;\n}<span class="cursor"></span>`;
+  $('#app').innerHTML = `<section class="hero"><div><span class="badge">LẬP TRÌNH C · 18 BUỔI · K19IT</span><h1>XỬ LÍ SỰ CỐ<br>PHẦN MỀM</h1>
+    <p>Học lập trình C từ con số 0: lý thuyết trực quan, ví dụ chạy ngay trên trình duyệt, bài tập thực tế và chấm điểm tự động.</p>
+    <p style="margin-top:14px">${S.user ? `Xin chào, <b>${esc(S.user.name)}</b> 👋` : 'Bạn đang xem với tư cách khách (chỉ xem điểm & điểm danh).'}</p>
+    <div class="stats"><div class="stat"><b>18</b><small>buổi học</small></div><div class="stat"><b>${DEFAULT_QUIZZES.length}+</b><small>đề trắc nghiệm</small></div><div class="stat"><b>${DEFAULT_LABS.length}</b><small>bài thực hành</small></div><div class="stat"><b>C</b><small>chạy trên web</small></div></div></div>
+    <div class="win"><div class="dots"><i></i><i></i><i></i><span>main.c</span></div><pre>${code}</pre></div></section>${mine}
+    ${isGuest() ? `<div class="grid">${qk('#/scores', 'chart', 'Bảng điểm', 'Xem điểm 15 phút, 1 tiết, thi của cả lớp.')}${qk('#/attendance', 'cal', 'Điểm danh', 'Xem danh sách điểm danh theo ngày.')}${qk('#/login', 'users', 'Đăng nhập', 'Sinh viên đăng nhập để học & làm bài.')}</div>` : `
+    <h2 class="sec">🚀 Truy cập nhanh</h2><div class="grid">${qk('#/ide', 'code', 'Lập trình C', 'Soạn, chạy, lưu code C như Dev-C++.')}${qk('#/quizzes', 'quiz', 'Trắc nghiệm', 'Kiểm tra 15 phút & 1 tiết.')}${qk('#/labs', 'flask', 'Thực hành', 'Bài tập code chấm tự động.')}${qk('#/rank', 'trophy', 'Xếp hạng', 'Bảng xếp hạng điểm của lớp.')}</div>
+    <h2 class="sec">📚 Lộ trình 18 buổi</h2><div class="lesson-grid">${LESSONS.map(lessonCard).join('')}</div>`}`;
 });

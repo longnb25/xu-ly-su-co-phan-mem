@@ -42,7 +42,7 @@ function initEditor(root, code, onChange) {
 
 /* ---------- Danh sách bài học ---------- */
 route('lessons', ['student', 'admin'], async () => {
-  $('#app').innerHTML = `<h2>📚 Bài học (18 buổi)</h2><div class="lesson-grid">${LESSONS.map(l => `<a class="card lcard" href="#/lesson/${l.n}" style="color:inherit;text-decoration:none"><div class="num">${l.n}</div><h3>Buổi ${l.n}</h3><b>${esc(l.title)}</b><p class="muted" style="margin:6px 0">${esc(l.sub.split('·')[0])}</p>${l.test ? `<span class="tag ${l.test === '15p' ? 'k15' : 'k1t'}">Kiểm tra ${l.test}</span>` : ''}<span class="tag">${l.codes.length} ví dụ · ${l.ex.length} bài tập</span></a>`).join('')}</div>`;
+  $('#app').innerHTML = `<h2>📚 Bài học (18 buổi)</h2><p class="muted">Mỗi buổi 3 giờ gồm lý thuyết, ví dụ chạy thử và bài tập thực tế.</p><div class="lesson-grid">${LESSONS.map(lessonCard).join('')}</div>`;
 });
 route('lesson', ['student', 'admin'], async id => {
   const l = LESSONS.find(x => x.n == id); if (!l) throw new Error('Không có buổi học này');
@@ -50,7 +50,7 @@ route('lesson', ['student', 'admin'], async id => {
   const extra = Object.entries(mats).filter(([, m]) => +m.lesson === l.n);
   const labs = [...DEFAULT_LABS, ...Object.entries(labsDb).map(([k, v]) => ({...v, id: k}))].filter(x => +x.lesson === l.n);
   $('#app').innerHTML = `<div class="row"><a href="#/lessons">← Danh sách</a><span class="sp"></span>${l.n > 1 ? `<a class="btn sm" href="#/lesson/${l.n - 1}">◀ Buổi ${l.n - 1}</a>` : ''}${l.n < 18 ? `<a class="btn sm" href="#/lesson/${l.n + 1}">Buổi ${l.n + 1} ▶</a>` : ''}</div>
-  <div class="hero" style="padding:22px 26px"><div class="muted" style="color:#fffc">BUỔI ${l.n} / 18 · 3 giờ (lý thuyết + thực hành)</div><h1 style="font-size:27px">${esc(l.title)}</h1><p>${esc(l.sub)}</p></div>
+  <div class="lh"><div class="kick">BUỔI ${l.n} / 18 · 3 GIỜ (LÝ THUYẾT + THỰC HÀNH)</div><h1>${esc(l.title)}</h1><p>${esc(l.sub)}</p></div>
   <div class="card"><h3>🎯 Mục tiêu</h3><ul>${l.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>
   <div class="card lessonbody"><h2>📖 Lý thuyết</h2>${l.theory}${l.diagram || ''}</div>
   <div class="card"><h2>💡 Ví dụ minh họa (chạy thử ngay)</h2>${l.codes.map((c, i) => `<div class="ex-code" data-i="${i}" style="margin-bottom:18px"><b>Ví dụ ${i + 1}: ${esc(c.t)}</b><pre><code>${hl(c.c)}</code></pre>
