@@ -128,9 +128,9 @@ function renderShell() {
   $('#side').classList.remove('open');
   const ini = S.user ? (S.user.name || '?').trim().split(' ').pop()[0].toUpperCase() : '👤';
   $('#who').innerHTML = S.user
-    ? `<div class="user"><div class="av">${isAdmin() ? '★' : esc(ini)}</div><span class="n">${isAdmin() ? 'Admin' : esc(S.user.name)}</span></div><button class="btn sm" id="pw">🔑</button><button class="btn sm" id="out">Thoát</button>`
+    ? `<div class="user"><div class="av">${isAdmin() ? '★' : esc(ini)}</div><span class="n">${isAdmin() ? 'Admin' : esc(S.user.name)}</span></div><button class="btn sm" id="hdrPw" title="Đổi mật khẩu">🔑</button><button class="btn sm" id="hdrOut">Thoát</button>`
     : `<div class="user"><div class="av">👤</div><span class="n">Khách</span></div><a class="btn pri sm" href="#/login">Đăng nhập</a>`;
-  if (S.user) { $('#pw').onclick = changePw; $('#out').onclick = () => { S.user = null; localStorage.removeItem('vb_user'); location.hash = '#/login'; }; }
+  if (S.user) { $('#hdrPw').onclick = changePw; $('#hdrOut').onclick =() => { S.user = null; localStorage.removeItem('vb_user'); location.hash = '#/login'; }; }
 }
 async function router() {
   const hash = location.hash || '#/';
@@ -190,7 +190,7 @@ route('', ['guest', 'student', 'admin'], async () => {
     const sc = await DB.get('scores/' + S.user.id) || {}; const avg = average(sc);
     mine = `<div class="card"><h3>📌 Điểm của bạn</h3><div class="row">${COLS.map(c => `<div class="tag" style="font-size:14px;padding:7px 16px">${c.t}: <b>${sc[c.k] ?? '–'}</b></div>`).join('')}<div class="tag" style="font-size:14px;padding:7px 16px;background:var(--grad);color:#fff;border:0">TB tạm tính: <b>${avg == null ? '–' : fmt(avg)}</b> ${xepLoai(avg)}</div></div></div>`;
   }
-  const code = `<span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>\n\n<span class="ty">int</span> main() {\n    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">1</span>; i &lt;= <span class="nm">3</span>; i++)\n        printf(<span class="st">"Buoi %d\n"</span>, i);\n    <span class="kw">return</span> <span class="nm">0</span>;\n}<span class="cursor"></span>`;
+  const code = `<span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>\n\n<span class="ty">int</span> main() {\n    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">1</span>; i &lt;= <span class="nm">3</span>; i++)\n        printf(<span class="st">"Buoi %d\\n"</span>, i);\n    <span class="kw">return</span> <span class="nm">0</span>;\n}<span class="cursor"></span>`;
   $('#app').innerHTML = `<section class="hero"><div><span class="badge">LẬP TRÌNH C · 18 BUỔI · K19IT</span><h1>XỬ LÍ SỰ CỐ<br>PHẦN MỀM</h1>
     <p>Học lập trình C từ con số 0: lý thuyết trực quan, ví dụ chạy ngay trên trình duyệt, bài tập thực tế và chấm điểm tự động.</p>
     <p style="margin-top:14px">${S.user ? `Xin chào, <b>${esc(S.user.name)}</b> 👋` : 'Bạn đang xem với tư cách khách (chỉ xem điểm & điểm danh).'}</p>

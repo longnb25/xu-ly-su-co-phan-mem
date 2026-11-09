@@ -111,7 +111,7 @@ route('ide', ['student', 'admin'], async () => {
     if (!/\.c$/i.test(name)) name += '.c'; const id = (cur && cur.id) || 'f' + Date.now();
     const rec = {name, code: ed.get(), ts: Date.now()}; await DB.set(`codes/${uid}/${id}`, rec); files[id] = rec; cur = {id, name}; $('#fn').textContent = name; dirty = false; list(); toast('Đã lưu "' + name + '"');
   };
-  const run = () => { const r = runC(ed.get(), $('#stdin').value); const o = $('#out'); o.innerHTML = `<span style="color:#9ad">${esc(r.log)}</span>\n\n` + outHtml(r); o.classList.toggle('err', !!r.err); };
+  const run = () => { const r = runC(ed.get(), $('#stdin').value); const o = $('#out'); o.innerHTML = (r.err ? '' : `<span style="color:#9ad">${esc(r.log)}</span>\n\n`) + outHtml(r); o.classList.toggle('err', !!r.err); };
   $('#save').onclick = () => save().catch(e => toast(e.message)); $('#run').onclick = run;
   $('#new').onclick = () => { cur = null; ed.set(SAMPLE_CODE); $('#fn').textContent = 'Chưa đặt tên'; list(); };
   $('#smp').onclick = () => ed.set(SAMPLE_CODE);
