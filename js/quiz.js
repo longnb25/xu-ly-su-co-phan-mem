@@ -14,9 +14,9 @@ route('quizzes', ['student', 'admin'], async () => {
     return `<div class="card" style="margin:0"><span class="tag ${q.kind === '15p' ? 'k15' : q.kind === '1t' ? 'k1t' : ''}">${KIND[q.kind] || 'Luyện tập'}</span> ${isOpen(q.id) ? '' : '<span class="tag">🔒 Đã đóng</span>'}${(meta[q.id] || {}).once ? '<span class="tag">1 lần</span>' : ''}
     <h3 style="margin:8px 0">${esc(q.title)}</h3><p class="muted" style="margin:0">${q.questions.length} câu · ${q.minutes || 15} phút${q.col ? ' · cột ' + colName(q.col) : ''}</p>
     ${r ? `<p>Kết quả của bạn: <b>${r.score}</b>/10 (${r.correct}/${r.total} câu)</p>` : ''}
-    <div class="row"><button class="btn pri sm" data-t="${esc(q.id)}" ${!isOpen(q.id) && !isAdmin() ? 'disabled' : ''}>Làm bài</button>
+    <div class="row"><button class="btn pri sm" data-qt="${esc(q.id)}" ${!isOpen(q.id) && !isAdmin() ? 'disabled' : ''}>Làm bài</button>
     ${isAdmin() ? `<button class="btn sm" data-r="${esc(q.id)}">📋 Kết quả (${n})</button><button class="btn sm" data-o="${esc(q.id)}">${isOpen(q.id) ? '🔒 Đóng' : '🔓 Mở'}</button><button class="btn sm" data-once="${esc(q.id)}">${(meta[q.id] || {}).once ? 'Cho làm lại' : 'Chỉ 1 lần'}</button><button class="btn sm" data-c="${esc(q.id)}">⧉ Nhân bản</button>${q.builtin ? '' : `<button class="btn sm" data-e="${esc(q.id)}">✏️ Sửa</button><button class="btn sm bad" data-d="${esc(q.id)}">🗑</button>`}` : ''}</div></div>`; }).join('')}</div>`;
-  $$('[data-t]').forEach(b => b.onclick = () => { location.hash = '#/quiz/' + b.dataset.t; });
+  $$('#app [data-qt]').forEach(b => b.onclick = () => { location.hash = '#/quiz/' + b.dataset.qt; });
   if (!isAdmin()) return;
   const by = id => qs.find(q => q.id === id);
   $$('[data-o]').forEach(b => b.onclick = async () => { await DB.patch('quizMeta/' + b.dataset.o, {open: !isOpen(b.dataset.o)}); router(); });
