@@ -73,6 +73,15 @@ const DEFAULT_LABS = [
   {id: 'l-13', title: 'Bài 13 · Tổng đường chéo chính', lesson: 17, desc: 'Nhập n rồi ma trận vuông n×n. In tổng đường chéo chính.', starter: '#include <stdio.h>\n\nint main() {\n    int n, a[10][10];\n    scanf("%d", &n);\n    return 0;\n}\n', tests: [{in: '2\n1 2\n3 4', out: '5'}, {in: '3\n1 2 3\n4 5 6\n7 8 9', out: '15'}]}
 ];
 
+/* Lịch dạy: Thứ 3 và Thứ 4 hằng tuần, bắt đầu tuần 09/11/2026 (18 buổi) */
+const SCHEDULE = (() => {
+  const out = [], iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  for (let w = 0; out.length < 18; w++) for (const off of [1, 2]) { if (out.length >= 18) break; const d = new Date(2026, 10, 9 + w * 7 + off); out.push({n: out.length + 1, date: iso(d), wd: d.getDay() === 2 ? 'Thứ 3' : 'Thứ 4'}); }
+  return out;
+})();
+const schedOf0 = n => { const s = SCHEDULE[n - 1]; return s ? s.wd.toUpperCase() + ' ' + s.date.split('-').reverse().join('/') : ''; };
+const schedOf = date => SCHEDULE.find(x => x.date === date);
+
 const SAMPLE_CODE = '#include <stdio.h>\n\nint main() {\n    printf("Xin chao K19IT!\\n");\n    return 0;\n}\n';
 
 const COLS = [

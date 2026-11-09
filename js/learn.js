@@ -50,7 +50,7 @@ route('lesson', ['student', 'admin'], async id => {
   const extra = Object.entries(mats).filter(([, m]) => +m.lesson === l.n);
   const labs = [...DEFAULT_LABS, ...Object.entries(labsDb).map(([k, v]) => ({...v, id: k}))].filter(x => +x.lesson === l.n);
   $('#app').innerHTML = `<div class="row"><a href="#/lessons">← Danh sách</a><span class="sp"></span>${l.n > 1 ? `<a class="btn sm" href="#/lesson/${l.n - 1}">◀ Buổi ${l.n - 1}</a>` : ''}${l.n < 18 ? `<a class="btn sm" href="#/lesson/${l.n + 1}">Buổi ${l.n + 1} ▶</a>` : ''}</div>
-  <div class="lh"><div class="kick">BUỔI ${l.n} / 18 · 3 GIỜ (LÝ THUYẾT + THỰC HÀNH)</div><h1>${esc(l.title)}</h1><p>${esc(l.sub)}</p></div>
+  <div class="lh"><div class="kick">BUỔI ${l.n} / 18 · ${schedOf0(l.n)} · 3 GIỜ</div><h1>${esc(l.title)}</h1><p>${esc(l.sub)}</p></div>
   <div class="lgrid"><div class="lmain">
   <div class="card" id="s-goal"><h3>🎯 Mục tiêu</h3><ul>${l.goals.map(g => `<li>${esc(g)}</li>`).join('')}</ul></div>
   <div class="card lessonbody" id="s-theory"><h2>📖 Lý thuyết</h2>${l.theory}${l.diagram || ''}</div>

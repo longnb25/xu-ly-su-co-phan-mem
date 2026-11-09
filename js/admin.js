@@ -92,18 +92,21 @@ route('rank', ['student', 'admin'], async () => {
 const ST = {C: ['Có', 'st-co'], V: ['Vắng', 'st-vang'], P: ['Phép', 'st-phep'], T: ['Đi trễ', 'st-tre']};
 const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const vnDate = d => d.split('-').reverse().join('/');
+const defaultDate = () => { const t = today(); if (schedOf(t)) return t; const nx = SCHEDULE.find(x => x.date >= t); return nx ? nx.date : SCHEDULE[SCHEDULE.length - 1].date; };
 route('attendance', ['guest', 'student', 'admin'], async () => {
   const [list, att] = await Promise.all([students(), DB.list('attendance')]);
-  const dates = Object.keys(att).sort();
+  const dates = [...new Set([...Object.keys(att), ...SCHEDULE.map(x => x.date)])].sort();
+  const dlabel = d => { const s = schedOf(d); return s ? `<small>${s.wd === 'Thứ 3' ? 'T3' : 'T4'}</small><br>${vnDate(d).slice(0, 5)}<br><small>B${s.n}</small>` : vnDate(d).slice(0, 5); };
   const count = (id, k) => dates.filter(d => (att[d] || {})[id] === k).length;
   let editor = '';
   if (isAdmin()) {
-    editor = `<div class="card"><div class="row"><h3 style="margin:0">✍️ Điểm danh ngày</h3><input type="date" id="dt" value="${today()}"><button class="btn sm" id="allC">Tất cả "Có"</button><span class="sp"></span><button class="btn pri" id="sv">💾 Lưu điểm danh</button><button class="btn" id="delD">🗑 Xóa ngày này</button></div><div class="tw" style="margin-top:10px"><table id="et"></table></div></div>`;
+    editor = `<div class="card"><div class="row"><h3 style="margin:0">✍️ Điểm danh ngày</h3><select id="ss" title="Chọn nhanh theo lịch dạy"><option value="">Chọn buổi…</option>${SCHEDULE.map(x => `<option value="${x.date}">Buổi ${x.n} · ${x.wd} ${vnDate(x.date)}${att[x.date] ? ' ✔' : ''}</option>`).join('')}</select><input type="date" id="dt" value="${defaultDate()}"><button class="btn sm" id="allC">Tất cả "Có"</button><span class="sp"></span><button class="btn pri" id="sv">💾 Lưu điểm danh</button><button class="btn" id="delD">🗑 Xóa ngày này</button></div><div class="tw" style="margin-top:10px"><table id="et"></table></div></div>`;
   }
   $('#app').innerHTML = `${editor}<div class="row"><h2>🗓 Danh sách điểm danh</h2><span class="sp"></span><button class="btn" id="exp">⬇ Xuất Excel</button></div>
-  <div class="card tw"><table><tr><th class="c">STT</th><th>Họ và tên</th>${dates.map(d => `<th class="c">${vnDate(d).slice(0, 5)}</th>`).join('')}<th class="c st-co">Có</th><th class="c st-vang">Vắng</th><th class="c st-phep">Phép</th><th class="c st-tre">Trễ</th></tr>
+  <div class="card tw"><table><tr><th class="c">STT</th><th>Họ và tên</th>${dates.map(d => `<th class="c" style="line-height:1.2">${dlabel(d)}</th>`).join('')}<th class="c st-co">Có</th><th class="c st-vang">Vắng</th><th class="c st-phep">Phép</th><th class="c st-tre">Trễ</th></tr>
   ${list.map((s, i) => `<tr style="${S.user && s.id === S.user.id ? 'outline:2px solid var(--pri)' : ''}"><td class="c">${i + 1}</td><td>${esc(fullName(s))}</td>${dates.map(d => { const v = (att[d] || {})[s.id]; return `<td class="c ${v ? ST[v][1] : ''}" title="${v ? ST[v][0] : ''}">${v || ''}</td>`; }).join('')}${['C', 'V', 'P', 'T'].map(k => `<td class="c">${count(s.id, k)}</td>`).join('')}</tr>`).join('')}</table></div>
-  <p class="muted">Ký hiệu: <b class="st-co">C</b> = Có, <b class="st-vang">V</b> = Vắng, <b class="st-phep">P</b> = Phép, <b class="st-tre">T</b> = Đi trễ. Tổng ${dates.length} buổi đã điểm danh.</p>`;
+  <p class="muted">Ký hiệu: <b class="st-co">C</b> = Có, <b class="st-vang">V</b> = Vắng, <b class="st-phep">P</b> = Phép, <b class="st-tre">T</b> = Đi trễ. Đã điểm danh ${Object.keys(att).length}/${SCHEDULE.length} buổi theo lịch.</p>
+  <div class="card"><h3>📅 Lịch dạy: Thứ 3 &amp; Thứ 4 hằng tuần (18 buổi)</h3><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px">${SCHEDULE.map(x => { const l = LESSONS[x.n - 1]; return `<div class="ex" style="margin:0;flex-direction:column;gap:2px"><div><b>Buổi ${x.n}</b> · ${x.wd} ${vnDate(x.date)} ${att[x.date] ? '<span class="st-co">✔</span>' : ''}</div><small class="muted">${esc(l.title)}${l.test ? ' · KT ' + l.test : ''}</small></div>`; }).join('')}</div></div>`;
   $('#exp').onclick = () => saveExcel('DiemDanh_K19IT.xlsx', [['Điểm danh', [['STT', 'Mã HSSV', 'Họ và tên', ...dates.map(vnDate), 'Có', 'Vắng', 'Phép', 'Trễ'], ...list.map((s, i) => [i + 1, s.id, fullName(s), ...dates.map(d => ((att[d] || {})[s.id] ? ST[att[d][s.id]][0] : '')), ...['C', 'V', 'P', 'T'].map(k => count(s.id, k))])]]]).catch(e => toast(e.message));
   if (!isAdmin()) return;
   const draw = () => {
@@ -112,7 +115,7 @@ route('attendance', ['guest', 'student', 'admin'], async () => {
       list.map((s, i) => `<tr><td class="c">${i + 1}</td><td>${esc(fullName(s))} ${s.note ? `<span class="tag">${esc(s.note)}</span>` : ''}</td>${Object.keys(ST).map(k => `<td class="c"><input type="radio" name="a_${esc(s.id)}" value="${k}" ${cur[s.id] === k ? 'checked' : ''}></td>`).join('')}</tr>`).join('');
     $('#delD').style.display = att[d] ? '' : 'none';
   };
-  draw(); $('#dt').onchange = draw;
+  draw(); $('#dt').onchange = () => { $('#ss').value = schedOf($('#dt').value) ? $('#dt').value : ''; draw(); }; $('#ss').onchange = e => { if (e.target.value) { $('#dt').value = e.target.value; draw(); } }; $('#ss').value = schedOf($('#dt').value) ? $('#dt').value : '';
   $('#allC').onclick = () => $$('#et input[value="C"]').forEach(r => r.checked = true);
   $('#sv').onclick = async () => {
     const d = $('#dt').value; if (!d) return toast('Chọn ngày');
