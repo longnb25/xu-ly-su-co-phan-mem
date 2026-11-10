@@ -1,0 +1,24 @@
+/* Bảng điểm danh */
+.att table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+.att th,.att td{white-space:nowrap;padding:8px 10px}
+.att th{vertical-align:middle;text-transform:none;letter-spacing:0;font-family:var(--font)}
+.att th:nth-child(1),.att td:nth-child(1){position:sticky;left:0;z-index:3;min-width:48px;background:var(--bg2)}
+.att th:nth-child(2),.att td:nth-child(2){position:sticky;left:48px;z-index:3;min-width:210px;background:var(--bg2);text-align:left;font-weight:600;border-right:2px solid var(--bd)}
+.att th:nth-child(1),.att th:nth-child(2){background:var(--bg3)}
+.att tr:nth-child(even) td:nth-child(1),.att tr:nth-child(even) td:nth-child(2){background:var(--bg3)}
+.att th:nth-child(n+3):nth-child(-n+6){font-size:12px;font-weight:800;min-width:52px;background:var(--bg3)}
+.att td.cnt{font:700 14px var(--mono);background:color-mix(in srgb,var(--bg3) 60%,transparent)}
+.att th.dh{min-width:76px;padding:6px 8px;line-height:1.2;border-left:1px solid var(--bd)}
+.att th.dh span{display:block}
+.att .dw{font:800 12px var(--font);text-transform:uppercase;letter-spacing:.5px;padding:1px 0;color:#fff;border-radius:3px;margin-bottom:3px}
+.att .dw.t3{background:#4f46e5}.att .dw.t4{background:#db2777}
+[data-theme="hacker"] .att .dw{color:#000}[data-theme="hacker"] .att .dw.t3{background:#00ff66}[data-theme="hacker"] .att .dw.t4{background:#b6ff00}
+.att .dd{font:800 17px var(--mono);color:var(--tx)}
+.att .db{font:600 11px var(--font);color:var(--tx2)}
+.att th.today,.att td.today{background:color-mix(in srgb,var(--acc) 18%,var(--bg2))!important;box-shadow:inset 0 3px 0 var(--acc)}
+.att .chip{display:inline-block;width:30px;height:26px;line-height:26px;border-radius:5px;font:800 13px var(--mono);color:#fff}
+.att .chip.C{background:var(--ok)}.att .chip.V{background:var(--bad)}.att .chip.P{background:var(--acc);color:#1a1200}.att .chip.T{background:#a855f7}
+[data-theme="hacker"] .att .chip.C,[data-theme="hacker"] .att .chip.P{color:#000}
+.att .dot{color:var(--bd);font-size:20px}
+.att tr.me td:nth-child(2){box-shadow:inset 4px 0 0 var(--pri)}
+.att tr.me td{outline:none}
